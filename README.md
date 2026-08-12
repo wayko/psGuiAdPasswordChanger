@@ -1,0 +1,2 @@
+# psGuiAdPasswordChanger
+Change ad password
