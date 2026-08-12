@@ -1,6 +1,6 @@
 # psGuiAdPasswordChanger
 
-A PowerShell **WPF** GUI for resetting user passwords in on‑prem **Active Directory**.
+A PowerShell GUI for resetting user passwords in on‑prem **Active Directory**.
 Built to run in **PowerShell 7** (recommended) and also works in **Windows PowerShell 5.1**
 on Windows. WPF requires an **STA** thread — the launcher takes care of that automatically.
 
@@ -20,11 +20,6 @@ pwsh -STA -File .\adPasswordChanger.ps1
 powershell -STA -File .\adPasswordChanger.ps1
 ```
 
-If you start it without `-STA`, the launcher relaunches itself in STA mode for you.
-
-No live domain? Set `Demo.Enabled = true` in the config (below) to explore the GUI with
-sample data. If the **ActiveDirectory** module is missing, the app auto‑falls back to demo
-mode (controlled by `Demo.AutoFallbackWhenNoAd`).
 
 ---
 
@@ -58,45 +53,37 @@ psGuiAdPasswordChanger\
 
 ## What it does
 
-* **Full OU tree, lazy‑loaded.** The tree shows the domain's OU structure. Expanding an OU
+* **Full OU tree** The tree shows the domain's OU structure. Expanding an OU
   reveals its child OUs and the users directly in it (loaded on demand, so large domains
   stay responsive). Each OU shows the number of users in its whole subtree, computed with a
   single fast query per level. Each user shows its display name and username plus status
   tags: **[Disabled] [Locked] [PW Expired]**, **[PW Expire : YYYY‑MM‑DD]**,
   **[Account Expired]** / **[Account Expire : YYYY‑MM‑DD]**.
-* **No hard‑coded password rule.** There is only a generator that follows the domain
+  
   **GPO password policy**. The effective policy is read live and shown in the GUI, the
   generator states how complex the password must be, and **Generate sample** shows a grey
   example. Every generated password is guaranteed to satisfy the policy (length + 3‑of‑4
   complexity categories when complexity is enabled). Character sets are cryptographically
   random (`RandomNumberGenerator`).
-* **Buttons.** `Connect & Load AD` (green) connects and loads the tree; `Reload AD`
-  reloads it.
-* **Global search + status filter.** A directory search box finds people **anywhere in
-  the domain** (by name, display name, account or personal id — not just nodes already
-  loaded in the tree). Results appear with checkboxes and feed the same run as tree
-  selections; **Back to tree** returns to the OU view. The tree itself can still be
-  filtered by **Year 1/2/3** and **active / disabled** (the *Show* dropdown), and the log
-  box has its own search.
+  
 * **Account options.** Enable/disable, unlock, *password never expires*, *must change at
-  next logon* — the last two are mutually exclusive and blocked from being set together
-  (in the UI and defensively in code).
+  next logon* 
 * **Test mode / What‑if.** `What if ( Simulate Change Password )` always simulates.
   `Change Passwords (live)` performs the real reset — but only when **Test mode** is
   unchecked; with Test mode on, a live click is safely downgraded to a simulation.
-* **Reports.** One **HTML** + one **CSV** per top‑level OU, with an optional combined
+  
+**Reports.** One **HTML** + one **CSV** per top‑level OU, with an optional combined
   report for all OUs. Reports are written to the output folder, which opens after the run.
   The HTML report has columns Name / Account / Status / State / PW, quick filter buttons
   (**Active, Inactive, Locked, PW never expires**), a search box, and Changed/Skipped tabs.
   Table **rows** use rotating colours (columns are not coloured); **hovering** a row makes
   its text bold and changes the row background.
+  
 * **Logging.** Everything is logged to the on‑screen log box and to a **daily log file**
   in `logs\` (with configurable retention).
 
 ---
-
 ## Configuration — `settings\config\config.json`
-
 The file is created with defaults on first run. Key settings:
 
 | Section | Key | Meaning |
@@ -115,12 +102,6 @@ The file is created with defaults on first run. Key settings:
 | `Demo` | `Enabled`, `AutoFallbackWhenNoAd` | Force demo data; auto‑demo when AD is unavailable. |
 
 ---
-
-## Assumptions worth confirming for your domain
-
-The tree is a generic **OU tree**. Set `SearchBase` in the config to the OU you want as the
-root (blank = the domain root, so the top level is the OUs directly under the domain, e.g.
-`TEST`, `Domain Controllers`). Reports are grouped per top‑level OU under that base.
 
 ## Requirements
 
