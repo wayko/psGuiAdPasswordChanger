@@ -10,19 +10,6 @@ on Windows. WPF requires an **STA** thread — the launcher takes care of that a
 
 ---
 
-## Run
-
-```powershell
-# Recommended (PowerShell 7)
-pwsh -STA -File .\adPasswordChanger.ps1
-
-# Windows PowerShell 5.1 also works
-powershell -STA -File .\adPasswordChanger.ps1
-```
-
-
----
-
 ## Folder layout
 
 ```
