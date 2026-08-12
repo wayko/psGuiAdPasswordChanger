@@ -1,12 +1,12 @@
 # psGuiAdPasswordChanger
 
+![](https://github.com/fardinbarashi/psGuiAdPasswordChanger/blob/main/githubRepoContentDeleteIfYouWant/logo.png)
+![](https://github.com/fardinbarashi/psGuiAdPasswordChanger/blob/main/githubRepoContentDeleteIfYouWant/1.jpg)
+![](https://github.com/fardinbarashi/psGuiAdPasswordChanger/blob/main/githubRepoContentDeleteIfYouWant/2.jpg)
 A PowerShell GUI for resetting user passwords in on‑prem **Active Directory**.
 Built to run in **PowerShell 7** (recommended) and also works in **Windows PowerShell 5.1**
-on Windows. WPF requires an **STA** thread — the launcher takes care of that automatically.
 
-> The launcher is intentionally minimal: it only guarantees STA, dot‑sources the
-> modules/functions, loads config + logging and shows the window. All real logic lives
-> in `functions\function` (one function per file) and `modules`.
+
 
 ---
 
