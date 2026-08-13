@@ -14,26 +14,13 @@ Built to run in **PowerShell 7** (recommended) and also works in **Windows Power
 
 ```
 psGuiAdPasswordChanger\
-├─ adPasswordChanger.ps1        # minimal loader
-├─ modules\
-│  └─ Import-AppModules.ps1         # loads WPF assemblies + ActiveDirectory
-├─ functions\function\             # one function per file
-│  ├─ Get-AppConfig.ps1  Initialize-AppLog.ps1  Write-AppLog.ps1
-│  ├─ Get-AdPasswordPolicy.ps1  Get-PasswordPolicyText.ps1
-│  ├─ New-CompliantPassword.ps1  Test-PasswordCompliance.ps1
-│  ├─ Get-AdChildOu.ps1  Get-AdOuUser.ps1  Get-UserStatusTag.ps1
-│  ├─ ConvertTo-UserObject.ps1  Get-DemoData.ps1  Get-TopOuFromDn.ps1
-│  ├─ Set-AdUserPassword.ps1  Set-AdAccountOption.ps1  Invoke-PasswordRun.ps1
-│  ├─ New-HtmlReport.ps1  New-CsvReport.ps1  Save-Report.ps1
-│  ├─ New-TreeNode.ps1  Expand-TreeNode.ps1  Set-NodeCheckState.ps1
-│  ├─ Get-TreeItem.ps1  Get-SelectedUser.ps1  Update-SelectedCount.ps1
-│  ├─ Update-UserFilter.ps1  Update-LogFilter.ps1  Invoke-GenerateSample.ps1
-│  ├─ Get-GuiGeneratorSetting.ps1  Search-AdUser.ps1  Connect-AdData.ps1
-│  └─ Invoke-GuiRun.ps1  Invoke-GlobalSearch.ps1  Show-MainWindow.ps1
-├─ settings\config\config.json      # settings
-├─ asset\logo\                       # logo used in GUI header + HTML report
-├─ asset\xaml\MainWindow.xaml        # the WPF layout
-└─ logs\                             # daily log files (auto‑created)
+├─ adPasswordChanger.ps1             # minimal loader
+├─ modules\                          # loads WPF assemblies + ActiveDirectory
+├─ functions\function\               # PS functions one per file
+├─ settings\config\config.json       # settings
+├─ asset\logo\                       # logo used in GUI header + HTML report / Can be changed to customize your report.
+├─ asset\xaml\MainWindow.xaml        # the GUI-layout
+└─ Files                             # Report files
 ```
 
 ---
