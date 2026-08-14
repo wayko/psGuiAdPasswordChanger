@@ -20,7 +20,7 @@ function Get-AppConfig {
             Domain     = [ordered]@{ Server=''; SearchBase=''; IncludeEmptyOus=$true }
             Attributes = [ordered]@{ PersonalIdAttribute='employeeID'; DisplayNameAttribute='displayName' }
             Generator  = [ordered]@{ DefaultLength=12; UseUpper=$true; UseLower=$true; UseDigit=$true; UseSpecial=$false; SpecialChars='!@#$%&*'; AvoidAmbiguous=$true; SamePasswordForAll=$false }
-            Report     = [ordered]@{ OutputFolder='C:\Temp\psGuiAdPasswordChanger\files\report'; OpenAfterRun=$true; CombinedReportByDefault=$false }
+            Report     = [ordered]@{ OutputFolder='files\report'; OpenAfterRun=$true; CombinedReportByDefault=$false }
             Logging    = [ordered]@{ Folder='logs'; RetentionDays=30 }
             Ui         = [ordered]@{ DomainLabel=''; TestModeDefault=$true }
             Demo       = [ordered]@{ Enabled=$false; AutoFallbackWhenNoAd=$true }

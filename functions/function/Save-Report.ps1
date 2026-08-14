@@ -2,6 +2,12 @@
 .SYNOPSIS
     Persists HTML + CSV reports (one per top-level OU) and an optional combined report.
     Opens the output folder when configured.
+.DESCRIPTION
+    Report.OutputFolder in config.json is relative to the script root by default
+    ('files\report'), so reports stay next to the application. An absolute path
+    (for example 'D:\Reports') is still honoured as-is. The legacy default
+    'C:\Temp\psGuiAdPasswordChanger\files\report' is mapped to the local
+    'files\report' folder so old config files keep working.
 #>
 function Save-Report {
     [CmdletBinding()]
@@ -12,10 +18,24 @@ function Save-Report {
         [object]$Config = $script:App.Config
     )
 
+    $defaultFolder = 'files\report'
+    $legacyFolder  = 'C:\Temp\psGuiAdPasswordChanger\files\report'
+
     $outFolder = $Config.Report.OutputFolder
     if ([string]::IsNullOrWhiteSpace($outFolder)) {
-        $outFolder = Join-Path $script:App.Root 'files\report'
+        $outFolder = $defaultFolder
     }
+
+    # Old config files pointed at C:\Temp — keep them working by using the local folder.
+    if ($outFolder.TrimEnd('\', '/') -ieq $legacyFolder) {
+        $outFolder = $defaultFolder
+    }
+
+    # Relative paths are resolved against the application root (same rule as the log folder).
+    if (-not [System.IO.Path]::IsPathRooted($outFolder)) {
+        $outFolder = Join-Path $script:App.Root $outFolder
+    }
+
     if (-not (Test-Path $outFolder)) {
         New-Item -ItemType Directory -Path $outFolder -Force | Out-Null
     }

@@ -19,7 +19,7 @@
     "SamePasswordForAll": false
   },
   "Report": {
-    "OutputFolder": "C:\\Temp\\psGuiAdPasswordChanger\\files\\report",
+    "OutputFolder": "files\\report",
     "OpenAfterRun": true,
     "CombinedReportByDefault": false
   },

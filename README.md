@@ -20,8 +20,12 @@ psGuiAdPasswordChanger\
 ├─ settings\config\config.json       # settings
 ├─ asset\logo\                       # logo used in GUI header + HTML report / Can be changed to customize your report.
 ├─ asset\xaml\MainWindow.xaml        # the GUI-layout
-└─ Files                             # Report files
+├─ logs\                             # daily log files
+└─ files\report\                     # HTML/CSV reports (default output folder)
 ```
+
+All output stays inside the application folder — reports in `files\report\`
+and logs in `logs\`. Nothing is written to `C:\Temp`.
 
 ---
 
@@ -47,7 +51,8 @@ psGuiAdPasswordChanger\
   unchecked; with Test mode on, a live click is safely downgraded to a simulation.
   
 **Reports.** One **HTML** + one **CSV** per top‑level OU, with an optional combined
-  report for all OUs. Reports are written to the output folder, which opens after the run.
+  report for all OUs. Reports are written to `files\report\` in the application folder
+  (created automatically), which opens after the run.
   The HTML report has columns Name / Account / Status / State / PW, quick filter buttons
   (**Active, Inactive, Locked, PW never expires**), a search box, and Changed/Skipped tabs.
   Table **rows** use rotating colours (columns are not coloured); **hovering** a row makes
@@ -68,7 +73,7 @@ The file is created with defaults on first run. Key settings:
 | `Attributes` | `PersonalIdAttribute` | AD attribute holding the personal id (default `employeeID`). |
 | `Attributes` | `DisplayNameAttribute` | Attribute used as the display name. |
 | `Generator` | `DefaultLength`, `UseUpper/Lower/Digit/Special`, `SpecialChars`, `AvoidAmbiguous`, `SamePasswordForAll` | Generator defaults (the policy always wins on minimum length/complexity). |
-| `Report` | `OutputFolder` | Where HTML/CSV reports are written. |
+| `Report` | `OutputFolder` | Where HTML/CSV reports are written. Default `files\report` — a **relative** path is resolved against the application folder; an absolute path (e.g. `D:\Reports` or a UNC share) is used as-is. Blank = `files\report`. |
 | `Report` | `OpenAfterRun` | Open the output folder when a run finishes. |
 | `Report` | `CombinedReportByDefault` | Tick the combined‑report box by default. |
 | `Logging` | `Folder`, `RetentionDays` | Log folder and how long to keep daily logs. |
