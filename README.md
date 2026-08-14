@@ -3,10 +3,10 @@
 ![](https://github.com/fardinbarashi/psGuiAdPasswordChanger/blob/main/githubRepoContentDeleteIfYouWant/logo.png)
 ![](https://github.com/fardinbarashi/psGuiAdPasswordChanger/blob/main/githubRepoContentDeleteIfYouWant/1.jpg)
 ![](https://github.com/fardinbarashi/psGuiAdPasswordChanger/blob/main/githubRepoContentDeleteIfYouWant/2.jpg)
+
 A PowerShell GUI for resetting user passwords in on‑prem **Active Directory**.
 Built to run in **PowerShell 7** (recommended) and also works in **Windows PowerShell 5.1**
-
-
+For best effect run this in the domaincontroller or MGMT server
 
 ---
 
@@ -35,17 +35,26 @@ and logs in `logs\`. Nothing is written to `C:\Temp`.
   reveals its child OUs and the users directly in it (loaded on demand, so large domains
   stay responsive). Each OU shows the number of users in its whole subtree, computed with a
   single fast query per level. Each user shows its display name and username plus status
-  tags: **[Disabled] [Locked] [PW Expired]**, **[PW Expire : YYYY‑MM‑DD]**,
-  **[Account Expired]** / **[Account Expire : YYYY‑MM‑DD]**.
+  tags: 
+  ```
+  User [Accountname] : 
+   - [Disabled][Locked] 
+   - [PW Expired] [PW Expire : YYYY‑MM‑DD] 
+   - [Account Expired] [Account Expire : YYYY‑MM‑DD]
+  ```
   
-  **GPO password policy**. The effective policy is read live and shown in the GUI, the
+* Password Generator :
+ **GPO password policy**. The effective policy is read live and shown in the GUI, the
   generator states how complex the password must be, and **Generate sample** shows a grey
   example. Every generated password is guaranteed to satisfy the policy (length + 3‑of‑4
   complexity categories when complexity is enabled). Character sets are cryptographically
-  random (`RandomNumberGenerator`).
+  random (`RandomNumberGenerator`). **Account options:** 
+  ```
+  - Enable/disable, unlock
+  - password never expires, must change at next logon
+  ```
   
-* **Account options.** Enable/disable, unlock, *password never expires*, *must change at
-  next logon* 
+  
 * **Test mode / What‑if.** `What if ( Simulate Change Password )` always simulates.
   `Change Passwords (live)` performs the real reset — but only when **Test mode** is
   unchecked; with Test mode on, a live click is safely downgraded to a simulation.
@@ -59,7 +68,7 @@ and logs in `logs\`. Nothing is written to `C:\Temp`.
   its text bold and changes the row background.
   
 * **Logging.** Everything is logged to the on‑screen log box and to a **daily log file**
-  in `logs\` (with configurable retention).
+  in `logs\`
 
 ---
 ## Configuration — `settings\config\config.json`
@@ -82,10 +91,3 @@ The file is created with defaults on first run. Key settings:
 
 ---
 
-## Requirements
-
-* Windows with the **.NET Desktop runtime** (for WPF).
-* **PowerShell 7** (or Windows PowerShell 5.1).
-* **RSAT ActiveDirectory** module for live use (`Get-ADDefaultDomainPasswordPolicy`,
-  `Get-ADUser`, `Set-ADAccountPassword`, …). Without it, the app runs in demo mode.
-* Rights to reset passwords / modify the account options for the target OUs.
