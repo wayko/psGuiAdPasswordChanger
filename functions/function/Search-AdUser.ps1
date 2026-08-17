@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
     General directory search: finds people anywhere in the domain (not just the
-    nodes already loaded in the tree). Matches name, display name, account and id.
+    nodes already loaded in the tree). Matches name, display name and account.
 .DESCRIPTION
     Wildcards are supported. Use '*' to match any sequence of characters
     (e.g. "Fardin*", "*konto*", "SA24*"). '?' matches a single character.
@@ -26,8 +26,8 @@ function Search-AdUser {
     if ($script:App.DemoMode) {
         $parents = @(
             'OU=DEMO,DC=env,DC=local',
-            'OU=Elever,DC=env,DC=local',
-            'OU=7A,OU=Elever,DC=env,DC=local'
+            'OU=Staff,DC=env,DC=local',
+            'OU=IT,OU=Staff,DC=env,DC=local'
         )
         $all = foreach ($p in $parents) {
             Get-DemoData -Level Users -Parent $p | ForEach-Object {
@@ -39,8 +39,7 @@ function Search-AdUser {
         return @($all | Where-Object {
             $_.Name           -like $pattern -or
             $_.SamAccountName -like $pattern -or
-            $_.Account        -like $pattern -or
-            ($_.PersonalId    -and $_.PersonalId -like $pattern)
+            $_.Account        -like $pattern
         } | Select-Object -First $MaxResults)
     }
 
@@ -54,25 +53,23 @@ function Search-AdUser {
     }
     if ($searchBase) { $common.SearchBase = $searchBase; $common.SearchScope = 'Subtree' }
 
-    $idAttr = $Config.Attributes.PersonalIdAttribute
-
     if ($hasWildcard) {
         # Preserve the user's '*' as an LDAP wildcard; map '?' -> '*' (LDAP has no
         # single-char wildcard). Escape the other LDAP special characters.
         $wild = $Term -replace '\\','\5c' -replace '\(','\28' -replace '\)','\29' -replace '\?','*'
-        $ldap = "(&(objectCategory=person)(objectClass=user)(|(name=$wild)(displayName=$wild)(sAMAccountName=$wild)(userPrincipalName=$wild)($idAttr=$wild)))"
+        $ldap = "(&(objectCategory=person)(objectClass=user)(|(name=$wild)(displayName=$wild)(sAMAccountName=$wild)(userPrincipalName=$wild)))"
     }
     else {
-        # No wildcard: ANR (ambiguous name resolution) + a "contains" on the id.
+        # No wildcard: ANR (ambiguous name resolution) covers name, display name,
+        # sAMAccountName and UPN in one go.
         $esc  = $Term -replace '\\','\5c' -replace '\*','\2a' -replace '\(','\28' -replace '\)','\29'
-        $ldap = "(&(objectCategory=person)(objectClass=user)(|(anr=$esc)($idAttr=*$esc*)))"
+        $ldap = "(&(objectCategory=person)(objectClass=user)(anr=$esc))"
     }
 
     $props = @('DisplayName','Enabled','LockedOut','PasswordNeverExpires','UserPrincipalName',
                'PasswordExpired','msDS-UserPasswordExpiryTimeComputed','AccountExpirationDate')
-    foreach ($a in @($idAttr, $Config.Attributes.DisplayNameAttribute)) {
-        if ($a -and $props -notcontains $a) { $props += $a }
-    }
+    $nameAttr = $Config.Attributes.DisplayNameAttribute
+    if ($nameAttr -and $props -notcontains $nameAttr) { $props += $nameAttr }
 
     $users = Get-ADUser -LDAPFilter $ldap -Properties $props -ResultSetSize $MaxResults @common |
              Sort-Object Name

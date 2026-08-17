@@ -40,27 +40,6 @@ function Set-AdUserPassword {
         $message = $_.Exception.Message
     }
 
-    $ou = if ($User.PSObject.Properties['Ou'] -and $User.Ou) {
-        $User.Ou
-    } else {
-        Get-TopOuFromDn -DistinguishedName $User.DistinguishedName -Config $Config
-    }
-
-    [pscustomobject]@{
-        Name                 = $User.Name
-        Account              = $User.Account
-        SamAccountName       = $User.SamAccountName
-        Enabled              = $User.Enabled
-        LockedOut            = $User.LockedOut
-        PasswordNeverExpires = $User.PasswordNeverExpires
-        PasswordExpired      = $User.PasswordExpired
-        PasswordExpiryDate   = $User.PasswordExpiryDate
-        AccountExpired       = $User.AccountExpired
-        AccountExpiryDate    = $User.AccountExpiryDate
-        State                = $state
-        Password             = $Password
-        Message              = $message
-        Ou               = $ou
-        OuDN             = ($User.DistinguishedName -replace '^CN=[^,]+,', '')
-    }
+    return (New-ResultRow -User $User -Password $Password -State $state -Message $message `
+                          -PasswordChanged $true -Config $Config)
 }

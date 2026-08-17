@@ -14,14 +14,11 @@ function Get-AdPasswordPolicy {
     if (-not $script:App.AdAvailable) {
         Write-AppLog 'ActiveDirectory not available - using demo password policy.' 'WARN'
         return [pscustomobject]@{
-            Source            = 'Demo'
             MinPasswordLength = 8
             ComplexityEnabled = $true
             PasswordHistory   = 24
-            MinPasswordAgeDays= 1
             MaxPasswordAgeDays= 42
             LockoutThreshold  = 5
-            RequiredCategories= 3
         }
     }
 
@@ -31,14 +28,11 @@ function Get-AdPasswordPolicy {
         $p = Get-ADDefaultDomainPasswordPolicy @params
 
         return [pscustomobject]@{
-            Source            = 'Default Domain Policy'
             MinPasswordLength = [int]$p.MinPasswordLength
             ComplexityEnabled = [bool]$p.ComplexityEnabled
             PasswordHistory   = [int]$p.PasswordHistoryCount
-            MinPasswordAgeDays= [int]$p.MinPasswordAge.TotalDays
             MaxPasswordAgeDays= [int]$p.MaxPasswordAge.TotalDays
             LockoutThreshold  = [int]$p.LockoutThreshold
-            RequiredCategories= $(if ($p.ComplexityEnabled) { 3 } else { 0 })
         }
     }
     catch {

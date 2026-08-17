@@ -49,7 +49,6 @@ function Get-AdChildOu {
         $count = [int]$counts[$ou.DistinguishedName]
         if (-not $Config.Domain.IncludeEmptyOus -and $count -eq 0) { continue }
         [pscustomobject]@{
-            Type              = 'OU'
             Name              = $ou.Name
             DistinguishedName = $ou.DistinguishedName
             Count             = $count

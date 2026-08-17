@@ -28,16 +28,16 @@ function Invoke-GlobalSearch {
         $found = @(Search-AdUser -Term $term)
 
         $c.LstSearch.Items.Clear()
-        foreach ($stu in $found) {
+        foreach ($user in $found) {
             $cb = New-Object System.Windows.Controls.CheckBox
             $cb.Margin = '2'
-            $cb.Tag = $stu
+            $cb.Tag = $user
 
-            $tags = (Get-UserStatusTag -User $stu | ForEach-Object { $_.Text }) -join ' '
-            $label = ('{0} ({1})   -   {2}' -f $stu.Name, $stu.SamAccountName, $stu.Account)
+            $tags = (Get-UserStatusTag -User $user | ForEach-Object { $_.Text }) -join ' '
+            $label = ('{0} ({1})   -   {2}' -f $user.Name, $user.SamAccountName, $user.Account)
             if ($tags) { $label = "$label   $tags" }
             $cb.Content = $label
-            if (-not $stu.Enabled) { $cb.Foreground = [System.Windows.Media.Brushes]::Gray }
+            if (-not $user.Enabled) { $cb.Foreground = [System.Windows.Media.Brushes]::Gray }
 
             $cb.Add_Click({ Update-SelectedCount })
             [void]$c.LstSearch.Items.Add($cb)

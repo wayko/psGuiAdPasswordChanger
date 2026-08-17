@@ -19,7 +19,7 @@ function Show-MainWindow {
         'TxtSelectedCount',
         'ChkOverride','PnlGen','TxtLength','ChkUpper','ChkLower','ChkDigit','ChkSpecial',
         'ChkSameAll','BtnGenerateSample','TxtSample','TxtPolicy',
-        'ChkChangeOptions','PnlOpts','ChkEnabled','ChkUnlock','ChkPne','ChkMustChange',
+        'ChkChangeOptions','PnlOpts','ChkEnabled','ChkUnlock','ChkPne','ChkMustChange','ChkNoPassword',
         'BtnWhatIf','BtnLive','BtnClear','TxtLogSearch','LogBox'
     )
     $script:App.Controls = @{}
@@ -130,7 +130,17 @@ function Show-MainWindow {
     $c.BtnGenerateSample.Add_Click({ Invoke-GenerateSample })
 
     # ---- Account options + mutual exclusion -----------------------------
-    $c.ChkChangeOptions.Add_Click({ $script:App.Controls.PnlOpts.IsEnabled = [bool]$script:App.Controls.ChkChangeOptions.IsChecked })
+    $c.ChkChangeOptions.Add_Click({
+        $cc = $script:App.Controls
+        $on = [bool]$cc.ChkChangeOptions.IsChecked
+        $cc.PnlOpts.IsEnabled = $on
+        # Leaving "no password change" ticked on a disabled panel would be misleading.
+        if (-not $on) { $cc.ChkNoPassword.IsChecked = $false }
+        Update-RunButtonText
+    })
+    # "No password change - only account options": the run buttons then apply the
+    # account options and never touch a password.
+    $c.ChkNoPassword.Add_Click({ Update-RunButtonText })
     $c.ChkPne.Add_Click({
         if ($script:App.Controls.ChkPne.IsChecked) {
             $script:App.Controls.ChkMustChange.IsChecked = $false

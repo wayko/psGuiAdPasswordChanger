@@ -2,6 +2,9 @@
 .SYNOPSIS
     Offline sample data (generic OU model) so the GUI can be demonstrated without a
     live domain. Enabled by config Demo.Enabled or auto-fallback when AD is missing.
+.NOTES
+    The OU names are deliberately generic (Staff / IT). The application makes no
+    assumption about what kind of organisation the domain belongs to.
 #>
 function Get-DemoData {
     [CmdletBinding()]
@@ -10,22 +13,22 @@ function Get-DemoData {
         [string]$Parent
     )
 
-    $root = 'DC=env,DC=local'
-    $dcOu = "OU=Domain Controllers,$root"
-    $demo = "OU=DEMO,$root"
-    $elev = "OU=Elever,$root"
-    $e7a  = "OU=7A,$elev"
+    $root  = 'DC=env,DC=local'
+    $dcOu  = "OU=Domain Controllers,$root"
+    $demo  = "OU=DEMO,$root"
+    $staff = "OU=Staff,$root"
+    $it    = "OU=IT,$staff"
 
     switch ($Level) {
         'ChildOus' {
             switch ($Parent) {
                 $root { return @(
-                    [pscustomobject]@{ Type='OU'; Name='Domain Controllers'; DistinguishedName=$dcOu; Count=0  },
-                    [pscustomobject]@{ Type='OU'; Name='DEMO';               DistinguishedName=$demo; Count=20 },
-                    [pscustomobject]@{ Type='OU'; Name='Elever';             DistinguishedName=$elev; Count=7  }
+                    [pscustomobject]@{ Name='Domain Controllers'; DistinguishedName=$dcOu;  Count=0  },
+                    [pscustomobject]@{ Name='DEMO';               DistinguishedName=$demo;  Count=20 },
+                    [pscustomobject]@{ Name='Staff';              DistinguishedName=$staff; Count=7  }
                 ) }
-                $elev { return @(
-                    [pscustomobject]@{ Type='OU'; Name='7A'; DistinguishedName=$e7a; Count=4 }
+                $staff { return @(
+                    [pscustomobject]@{ Name='IT'; DistinguishedName=$it; Count=4 }
                 ) }
                 default { return @() }
             }
@@ -56,14 +59,14 @@ function Get-DemoData {
                         @{ N='Sofia Hansson';     En=$true;  Lo=$false; Pne=$true;  Exp=$false; D=$null }
                     )
                 }
-                $elev {
+                $staff {
                     @(
                         @{ N='Oscar Ek';    En=$true;  Lo=$false; Pne=$false; Exp=$false; D='2026-11-09' },
                         @{ N='Wilma Holm';  En=$true;  Lo=$false; Pne=$false; Exp=$false; D='2026-12-14' },
                         @{ N='Hugo Falk';   En=$false; Lo=$false; Pne=$false; Exp=$true;  D=$null }
                     )
                 }
-                $e7a {
+                $it {
                     @(
                         @{ N='Alva Berg';   En=$true;  Lo=$false; Pne=$false; Exp=$false; D='2026-10-01' },
                         @{ N='Liam Ahl';    En=$true;  Lo=$false; Pne=$false; Exp=$false; D='2026-11-19' },
@@ -92,8 +95,6 @@ function Get-DemoData {
                     PasswordExpiryDate   = $exp
                     AccountExpired       = [bool]$_.AExp
                     AccountExpiryDate    = $aexp
-                    PersonalId           = ''
-                    HasPersonalId        = $false
                 }
             }
         }

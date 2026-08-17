@@ -105,7 +105,7 @@
               <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBox x:Name="TxtGlobalSearch" Grid.Column="0" Padding="8,6"
-                     Tag="Search account in the domain - Name, account, ID ( wildcard : User* )" />
+                     Tag="Search account in the domain - name, display name or account ( wildcard : User* )" />
             <Button x:Name="BtnSearch" Grid.Column="1" Content="Search" Margin="8,0,0,0"/>
             <Button x:Name="BtnSearchClear" Grid.Column="2" Content="Back to tree" Style="{StaticResource Ghost}"
                     Margin="6,0,0,0" Visibility="Collapsed"/>
@@ -174,18 +174,20 @@
                   <CheckBox x:Name="ChkPne"        Content="Password never expires" Margin="0,0,16,6"/>
                   <CheckBox x:Name="ChkMustChange" Content="Must change password at next logon" Margin="0,0,16,6"/>
                 </WrapPanel>
-                <TextBlock Text="Applied to the selected users when you run What if (simulated) or Change Passwords (live)."
+                <CheckBox x:Name="ChkNoPassword" Content="No password change - only account options"
+                          FontWeight="SemiBold" Margin="0,4,0,6"/>
+                <TextBlock Text="Applied to the selected users when you run What if (simulated) or the live button. Tick the box above to change only the account options and leave every password untouched."
                            Foreground="{StaticResource Muted}" FontSize="11" TextWrapping="Wrap"/>
               </StackPanel>
             </StackPanel>
           </Border>
 
           <!-- Actions -->
-          <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-            <Button x:Name="BtnWhatIf" Content="What if ( Simulate Change Password )" Margin="0,0,8,0"/>
-            <Button x:Name="BtnLive"   Content="Change password ( Live )" Background="{StaticResource Red}" Margin="0,0,8,0"/>
-            <Button x:Name="BtnClear"  Content="Clear selection" Style="{StaticResource Ghost}"/>
-          </StackPanel>
+          <WrapPanel Margin="0,0,0,12">
+            <Button x:Name="BtnWhatIf" Content="What if ( Simulate Change Password )" Margin="0,0,8,8"/>
+            <Button x:Name="BtnLive"   Content="Change password ( Live )" Background="{StaticResource Red}" Margin="0,0,8,8"/>
+            <Button x:Name="BtnClear"  Content="Clear selection" Style="{StaticResource Ghost}" Margin="0,0,8,8"/>
+          </WrapPanel>
 
           <!-- Log -->
           <Border Style="{StaticResource Card}" Background="#0F2233">

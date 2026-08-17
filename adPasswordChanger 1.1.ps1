@@ -14,6 +14,9 @@
 [CmdletBinding()]
 param()
 
+# Files copied from a zip are blocked by Windows - unblock the whole folder first.
+Get-ChildItem -Path $PSScriptRoot -Recurse -File | Unblock-File -ErrorAction SilentlyContinue
+
 $ErrorActionPreference = 'Stop'
 
 # --- Ensure a single-threaded apartment (WPF requirement) -------------------

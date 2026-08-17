@@ -20,9 +20,8 @@ function Get-AdOuUser {
 
     $props = @('DisplayName', 'Enabled', 'LockedOut', 'PasswordNeverExpires', 'UserPrincipalName',
                'PasswordExpired', 'msDS-UserPasswordExpiryTimeComputed', 'AccountExpirationDate')
-    foreach ($a in @($Config.Attributes.PersonalIdAttribute, $Config.Attributes.DisplayNameAttribute)) {
-        if ($a -and $props -notcontains $a) { $props += $a }
-    }
+    $nameAttr = $Config.Attributes.DisplayNameAttribute
+    if ($nameAttr -and $props -notcontains $nameAttr) { $props += $nameAttr }
 
     $users = Get-ADUser -SearchBase $OuDN -SearchScope $Scope -Filter * -Properties $props @common |
              Sort-Object Name

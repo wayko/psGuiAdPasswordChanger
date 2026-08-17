@@ -10,6 +10,9 @@ For best effect run this in the domaincontroller or MGMT server
 
 ---
 
+## News
+- Added options if you only want to change account options 1.1
+
 ## Folder layout
 
 ```

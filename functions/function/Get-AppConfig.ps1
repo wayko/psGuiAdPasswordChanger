@@ -18,11 +18,11 @@ function Get-AppConfig {
     if (-not (Test-Path $configPath)) {
         $default = [ordered]@{
             Domain     = [ordered]@{ Server=''; SearchBase=''; IncludeEmptyOus=$true }
-            Attributes = [ordered]@{ PersonalIdAttribute='employeeID'; DisplayNameAttribute='displayName' }
+            Attributes = [ordered]@{ DisplayNameAttribute='displayName' }
             Generator  = [ordered]@{ DefaultLength=12; UseUpper=$true; UseLower=$true; UseDigit=$true; UseSpecial=$false; SpecialChars='!@#$%&*'; AvoidAmbiguous=$true; SamePasswordForAll=$false }
             Report     = [ordered]@{ OutputFolder='files\report'; OpenAfterRun=$true; CombinedReportByDefault=$false }
             Logging    = [ordered]@{ Folder='logs'; RetentionDays=30 }
-            Ui         = [ordered]@{ DomainLabel=''; TestModeDefault=$true }
+            Ui         = [ordered]@{ DomainLabel=''; TestModeDefault=$true; ShowDoneDialog=$true }
             Demo       = [ordered]@{ Enabled=$false; AutoFallbackWhenNoAd=$true }
         }
         ($default | ConvertTo-Json -Depth 6) | Set-Content -Path $configPath -Encoding UTF8

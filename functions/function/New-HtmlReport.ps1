@@ -16,7 +16,8 @@ function New-HtmlReport {
         [Parameter(Mandatory)] [string]$OuName,   # OU name
         [Parameter(Mandatory)] [AllowEmptyCollection()] [object[]]$Results,
         [string]$LogoPath = (Join-Path $script:App.Root 'asset\logo\logo.png'),
-        [bool]$WhatIf = $true
+        [bool]$WhatIf = $true,
+        [bool]$OptionsOnly = $false
     )
 
     if (-not ('System.Web.HttpUtility' -as [type])) {
@@ -71,12 +72,26 @@ function New-HtmlReport {
             $pne    = if ($r.PasswordNeverExpires) { '1' } else { '0' }
             $pwexp  = if ($r.PSObject.Properties['PasswordExpired'] -and $r.PasswordExpired) { '1' } else { '0' }
             $hay = (@($r.Name,$r.Account) -join ' ').ToLower()
+
+            # Rows from an account-options run carry no password - show that plainly
+            # instead of a masked value nobody can reveal.
+            $pwChanged = if ($r.PSObject.Properties['PasswordChanged']) { [bool]$r.PasswordChanged } else { $true }
+            $pwCell = if ($pwChanged) {
+                "<code class='pw' data-pw=""$(Enc $r.Password)"">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</code><button type='button' class='pwbtn rowpw'>show</button>"
+            } else {
+                "<span class='nochange'>- not changed -</span>"
+            }
+            $optCell = if ($r.PSObject.Properties['Options'] -and $r.Options) {
+                (($r.Options -split ',\s*') | ForEach-Object { "<span class='tag muted'>$(Enc $_)</span>" }) -join ' '
+            } else { '' }
+
             [void]$sb.AppendLine(@"
       <tr class='row $tone' data-active='$active' data-locked='$locked' data-pne='$pne' data-pwexpired='$pwexp' data-search='$(Enc $hay)'>
         <td class='c-name'>$(Enc $r.Name)</td>
         <td class='c-acct'>$(Enc $r.Account)</td>
         <td class='c-state'>$(New-StatusHtml $r)</td>
-        <td class='c-pw'><code class='pw' data-pw="$(Enc $r.Password)">&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;</code><button type='button' class='pwbtn rowpw'>show</button></td>
+        <td class='c-opt'>$optCell</td>
+        <td class='c-pw'>$pwCell</td>
       </tr>
 "@)
         }
@@ -86,8 +101,18 @@ function New-HtmlReport {
     $changedRows = New-Rows $changed
     $skippedRows = New-Rows $skipped
     $generated   = Get-Date -Format 'yyyy-MM-dd HH:mm'
-    $modeBanner  = if ($WhatIf) { "<div class='mode'>TEST MODE / What-if &mdash; no passwords were actually changed</div>" } else { '' }
-    $changedLabel = if ($WhatIf) { 'Would change' } else { 'PW changed' }
+    $whatIfText  = if ($OptionsOnly) { 'TEST MODE / What-if &mdash; no account options were actually written' }
+                   else             { 'TEST MODE / What-if &mdash; no passwords were actually changed' }
+    $modeBanner  = if ($WhatIf) { "<div class='mode'>$whatIfText</div>" } else { '' }
+    if ($OptionsOnly -and -not $WhatIf) {
+        $modeBanner = "<div class='mode'>ACCOUNT OPTIONS ONLY &mdash; no passwords were changed</div>"
+    }
+    $reportTitle  = if ($OptionsOnly) { 'Account options report' } else { 'PW report' }
+    $changedLabel = if ($OptionsOnly) {
+        if ($WhatIf) { 'Would update' } else { 'Options updated' }
+    }
+    elseif ($WhatIf) { 'Would change' }
+    else             { 'PW changed' }
 
     $html = @"
 <!DOCTYPE html>
@@ -95,7 +120,7 @@ function New-HtmlReport {
 <head>
 <meta charset='utf-8'/>
 <meta name='viewport' content='width=device-width, initial-scale=1'/>
-<title>PW report - $(Enc $OuName)</title>
+<title>$reportTitle - $(Enc $OuName)</title>
 <style>
   :root{--blue:#1e76be;--blue2:#175c96;--ink:#1f2a37;--muted:#6b7280;--line:#e6ebf1;--ok:#16a34a;--warn:#d97706;--fail:#dc2626;}
   *{box-sizing:border-box}
@@ -143,6 +168,8 @@ function New-HtmlReport {
   .tag.info{color:#8a5a00;background:#fff2dc}
   .tag.muted{color:#475569;background:#eef2f7}
   .tag.ok{color:#0f7b3f;background:#e7f8ee}
+  .nochange{color:var(--muted);font-style:italic;font-size:13px}
+  .c-opt .tag{margin-right:4px}
   .empty{padding:30px;text-align:center;color:var(--muted)}
   .foot{text-align:center;color:var(--muted);font-size:13px;margin:22px 0 6px}
   .hidden{display:none}
@@ -152,7 +179,7 @@ function New-HtmlReport {
 <div class='wrap'>
   <div class='header'>
     <div class='brand'>$logoTag<span>AD-PasswordChanger</span></div>
-    <h1>PW report - $(Enc $OuName)</h1>
+    <h1>$reportTitle - $(Enc $OuName)</h1>
     <div class='sub'>Generated $generated</div>
     $modeBanner
     <div class='note'>Handle passwords confidentially and send the report encrypted.</div>
@@ -181,13 +208,13 @@ function New-HtmlReport {
 
   <div class='tablewrap'>
     <table id='tbl-changed'>
-      <thead><tr><th>Name</th><th>Account</th><th>State</th><th>PW <button type='button' class='pwbtn'>Show all</button></th></tr></thead>
+      <thead><tr><th>Name</th><th>Account</th><th>State</th><th>Options</th><th>PW <button type='button' class='pwbtn'>Show all</button></th></tr></thead>
       <tbody>
 $changedRows
       </tbody>
     </table>
     <table id='tbl-failed' class='hidden'>
-      <thead><tr><th>Name</th><th>Account</th><th>State</th><th>PW <button type='button' class='pwbtn'>Show all</button></th></tr></thead>
+      <thead><tr><th>Name</th><th>Account</th><th>State</th><th>Options</th><th>PW <button type='button' class='pwbtn'>Show all</button></th></tr></thead>
       <tbody>
 $skippedRows
       </tbody>
@@ -225,7 +252,7 @@ $skippedRows
   });
 
   // ---- Password masking (default: masked) ----
-  var MASK = '••••••••';
+  var MASK = String.fromCharCode(8226).repeat(8);
   function setPw(code, reveal){
     code.textContent = reveal ? code.getAttribute('data-pw') : MASK;
     code.setAttribute('data-revealed', reveal ? '1' : '0');

@@ -59,9 +59,9 @@ function Connect-AdData {
             [void]$c.TreeAd.Items.Add((New-TreeNode -Node $ou -Type 'OU'))
         }
         $rootUsers = @(Get-AdOuUser -OuDN $rootDn -Scope OneLevel)
-        foreach ($stu in $rootUsers) {
-            $stu | Add-Member -NotePropertyName 'Ou' -NotePropertyValue (Get-TopOuFromDn -DistinguishedName $stu.DistinguishedName) -Force
-            [void]$c.TreeAd.Items.Add((New-TreeNode -Node $stu -Type 'User'))
+        foreach ($user in $rootUsers) {
+            $user | Add-Member -NotePropertyName 'Ou' -NotePropertyValue (Get-TopOuFromDn -DistinguishedName $user.DistinguishedName) -Force
+            [void]$c.TreeAd.Items.Add((New-TreeNode -Node $user -Type 'User'))
         }
 
         $domainLabel = if ($cfg.Ui.DomainLabel) { $cfg.Ui.DomainLabel }

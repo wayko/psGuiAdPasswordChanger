@@ -23,6 +23,12 @@ function Get-PasswordPolicyText {
     if ($Policy.PasswordHistory -gt 0) {
         $lines.Add(("Cannot reuse the last {0} passwords." -f $Policy.PasswordHistory))
     }
+    if ($Policy.MaxPasswordAgeDays -gt 0) {
+        $lines.Add(("Passwords expire after {0} days." -f $Policy.MaxPasswordAgeDays))
+    }
+    if ($Policy.LockoutThreshold -gt 0) {
+        $lines.Add(("Account locks out after {0} failed attempts." -f $Policy.LockoutThreshold))
+    }
 
     return ($lines -join [Environment]::NewLine)
 }

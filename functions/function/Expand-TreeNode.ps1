@@ -27,9 +27,9 @@ function Expand-TreeNode {
 
         # Then users directly in this OU.
         $users = @(Get-AdOuUser -OuDN $meta.DN -Scope OneLevel)
-        foreach ($stu in $users) {
-            $stu | Add-Member -NotePropertyName 'Ou' -NotePropertyValue (Get-TopOuFromDn -DistinguishedName $stu.DistinguishedName) -Force
-            [void]$Item.Items.Add((New-TreeNode -Node $stu -Type 'User'))
+        foreach ($user in $users) {
+            $user | Add-Member -NotePropertyName 'Ou' -NotePropertyValue (Get-TopOuFromDn -DistinguishedName $user.DistinguishedName) -Force
+            [void]$Item.Items.Add((New-TreeNode -Node $user -Type 'User'))
         }
 
         Write-AppLog ("Loaded '{0}': {1} sub-OU(s), {2} user(s)." -f $meta.Name, $childOus.Count, $users.Count) 'DEBUG'

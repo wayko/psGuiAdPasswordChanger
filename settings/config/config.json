@@ -5,7 +5,6 @@
     "IncludeEmptyOus": true
   },
   "Attributes": {
-    "PersonalIdAttribute": "employeeID",
     "DisplayNameAttribute": "displayName"
   },
   "Generator": {
@@ -29,7 +28,8 @@
   },
   "Ui": {
     "DomainLabel": "",
-    "TestModeDefault": true
+    "TestModeDefault": true,
+    "ShowDoneDialog": true
   },
   "Demo": {
     "Enabled": false,

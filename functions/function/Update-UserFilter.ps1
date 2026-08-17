@@ -13,12 +13,12 @@ function Update-UserFilter {
     foreach ($item in (Get-TreeItem -Parent $c.TreeAd -OnlyLoaded)) {
         $meta = $item.Tag
         if ($meta.Type -ne 'User') { continue }
-        $stu = $meta.User
+        $user = $meta.User
         $visible = $true
 
         # Status
-        if ($showIdx -eq 1 -and -not $stu.Enabled) { $visible = $false }
-        if ($showIdx -eq 2 -and $stu.Enabled)      { $visible = $false }
+        if ($showIdx -eq 1 -and -not $user.Enabled) { $visible = $false }
+        if ($showIdx -eq 2 -and $user.Enabled)      { $visible = $false }
 
         $item.Visibility = if ($visible) { [System.Windows.Visibility]::Visible } else { [System.Windows.Visibility]::Collapsed }
     }

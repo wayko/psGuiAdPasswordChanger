@@ -10,10 +10,8 @@ function ConvertTo-UserObject {
     )
 
     process {
-        $idAttr    = $Config.Attributes.PersonalIdAttribute
         $nameAttr  = $Config.Attributes.DisplayNameAttribute
 
-        $personalId = if ($idAttr -and $AdUser.PSObject.Properties[$idAttr]) { [string]$AdUser.$idAttr } else { '' }
         $displayName = if ($nameAttr -and $AdUser.PSObject.Properties[$nameAttr] -and $AdUser.$nameAttr) { [string]$AdUser.$nameAttr } else { [string]$AdUser.Name }
 
         $enabled   = if ($AdUser.PSObject.Properties['Enabled'])   { [bool]$AdUser.Enabled }   else { $true }
@@ -51,8 +49,6 @@ function ConvertTo-UserObject {
             PasswordExpiryDate   = $pwExpiry
             AccountExpired       = $acctExpired
             AccountExpiryDate    = $acctExpiry
-            PersonalId           = $personalId
-            HasPersonalId        = -not [string]::IsNullOrWhiteSpace($personalId)
         }
     }
 }

@@ -15,6 +15,7 @@ function Save-Report {
         [Parameter(Mandatory)] [object[]]$Results,
         [bool]$WhatIf = $true,
         [bool]$Combined = $false,
+        [bool]$OptionsOnly = $false,
         [object]$Config = $script:App.Config
     )
 
@@ -26,7 +27,7 @@ function Save-Report {
         $outFolder = $defaultFolder
     }
 
-    # Old config files pointed at C:\Temp — keep them working by using the local folder.
+    # Old config files pointed at C:\Temp - keep them working by using the local folder.
     if ($outFolder.TrimEnd('\', '/') -ieq $legacyFolder) {
         $outFolder = $defaultFolder
     }
@@ -41,7 +42,10 @@ function Save-Report {
     }
 
     $stamp  = Get-Date -Format 'yyyy-MM-dd_HH-mm'
-    $suffix = if ($WhatIf) { '_WhatIf' } else { '_Live' }
+    # An account-options-only run is marked _Options so it is never mistaken for a
+    # password run when someone browses the report folder later.
+    $kind   = if ($OptionsOnly) { '_Options' } else { '' }
+    $suffix = if ($WhatIf) { "${kind}_WhatIf" } else { "${kind}_Live" }
     $written = New-Object System.Collections.Generic.List[string]
 
     function Get-SafeName([string]$name) {
@@ -58,7 +62,7 @@ function Save-Report {
         $htmlPath = Join-Path $outFolder ("OU_{0}_{1}{2}.html" -f $safe, $stamp, $suffix)
         $csvPath  = Join-Path $outFolder ("OU_{0}_{1}{2}.csv"  -f $safe, $stamp, $suffix)
 
-        (New-HtmlReport -OuName $grp.Name -Results $rows -WhatIf:$WhatIf) | Set-Content -Path $htmlPath -Encoding UTF8
+        (New-HtmlReport -OuName $grp.Name -Results $rows -WhatIf:$WhatIf -OptionsOnly:$OptionsOnly) | Set-Content -Path $htmlPath -Encoding UTF8
         Write-AppLog ("Report saved: {0}" -f $htmlPath) 'INFO'
         [void]$written.Add($htmlPath)
 
@@ -70,7 +74,7 @@ function Save-Report {
     if ($Combined -and $groups.Count -gt 1) {
         $htmlPath = Join-Path $outFolder ("OU_ALL_{0}{1}.html" -f $stamp, $suffix)
         $csvPath  = Join-Path $outFolder ("OU_ALL_{0}{1}.csv"  -f $stamp, $suffix)
-        (New-HtmlReport -OuName 'All OUs (combined)' -Results $Results -WhatIf:$WhatIf) | Set-Content -Path $htmlPath -Encoding UTF8
+        (New-HtmlReport -OuName 'All OUs (combined)' -Results $Results -WhatIf:$WhatIf -OptionsOnly:$OptionsOnly) | Set-Content -Path $htmlPath -Encoding UTF8
         New-CsvReport -Results $Results -Path $csvPath | Out-Null
         Write-AppLog ("Combined report saved: {0}" -f $htmlPath) 'INFO'
         [void]$written.Add($htmlPath); [void]$written.Add($csvPath)

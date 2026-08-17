@@ -26,7 +26,11 @@ function New-CsvReport {
                       @{N='PWexpire';E={FmtDate $_.PasswordExpiryDate}},
                       @{N='AccountExpired';E={$_.AccountExpired}},
                       @{N='AccountExpire';E={FmtDate $_.AccountExpiryDate}},
-                      @{N='PW';E={$_.Password}},
+                      @{N='Options';E={ if ($_.PSObject.Properties['Options']) { $_.Options } else { '' } }},
+                      @{N='PW';E={
+                            $changed = if ($_.PSObject.Properties['PasswordChanged']) { [bool]$_.PasswordChanged } else { $true }
+                            if ($changed) { $_.Password } else { '- not changed -' }
+                        }},
                       Message
 
     $rows | Export-Csv -Path $Path -NoTypeInformation -Encoding UTF8 -Delimiter ';'
