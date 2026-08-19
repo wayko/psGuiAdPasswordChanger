@@ -12,77 +12,80 @@ For best effect run this in the domaincontroller or MGMT server
 
 ## News
 - Added options if you only want to change account options 1.1
+---
 
 ## Folder layout
 
 ```
 psGuiAdPasswordChanger\
-├─ adPasswordChanger.ps1             # minimal loader
+├─ adPasswordChanger 1.1.ps1         # minimal loader
 ├─ modules\                          # loads WPF assemblies + ActiveDirectory
-├─ functions\function\               # PS functions one per file
+├─ functions\function\               # functions, one psfile per function
 ├─ settings\config\config.json       # settings
 ├─ asset\logo\                       # logo used in GUI header + HTML report / Can be changed to customize your report.
 ├─ asset\xaml\MainWindow.xaml        # the GUI-layout
-├─ logs\                             # daily log files
-└─ files\report\                     # HTML/CSV reports (default output folder)
+├─ logs\                             # log files
+└─ files\report\                     # HTML/CSV reports
 ```
-
-All output stays inside the application folder — reports in `files\report\`
-and logs in `logs\`. Nothing is written to `C:\Temp`.
-
 ---
 
-## What it does
-
-* **Full OU tree** The tree shows the domain's OU structure. Expanding an OU
-  reveals its child OUs and the users directly in it (loaded on demand, so large domains
-  stay responsive). Each OU shows the number of users in its whole subtree, computed with a
-  single fast query per level. Each user shows its display name and username plus status
-  tags: 
-  ```
-  User [Accountname] : 
-   - [Disabled][Locked] 
-   - [PW Expired] [PW Expire : YYYY‑MM‑DD] 
-   - [Account Expired] [Account Expire : YYYY‑MM‑DD]
-  ```
+## Features
+### OU tree
+  **Full OU tree** 
+  The tree shows the domain's OU structure. 
+  Expanding an OU reveals its child OUs and the users directly in it.
+  Each OU shows the number of users in its whole subtree, 
+  Each user shows its display name and username plus status
+  Status Tags: 
+  | Tag | Meaning |
+  |-----|---------|
+  | `User [Accountname]` | The account the tags below apply to |
+  | `[Disabled]` | The account is disabled |
+  | `[Locked]` | The account is locked out |
+  | `[PW Expired]` | The password has already expired |
+  | `[PW Expire : YYYY-MM-DD]` | Date the password expires |
+  | `[Account Expired]` | The account has already expired |
+  | `[Account Expire : YYYY-MM-DD]` | Date the account expires |
   
-* Password Generator :
- **GPO password policy**. The effective policy is read live and shown in the GUI, the
+  
+### Password Generator :
+  **GPO password policy**. 
+  The effective policy is read live and shown in the GUI, the
   generator states how complex the password must be, and **Generate sample** shows a grey
-  example. Every generated password is guaranteed to satisfy the policy (length + 3‑of‑4
-  complexity categories when complexity is enabled). Character sets are cryptographically
-  random (`RandomNumberGenerator`). **Account options:** 
-  ```
-  - Enable/disable, unlock
-  - password never expires, must change at next logon
-  ```
+  example. Every generated password is will satisfy the policy (length + 3‑of‑4
+  complexity categories when complexity is enabled). 
+  Character sets are cryptographically random (`RandomNumberGenerator`). 
+  
+### Account options:
+| Option | Description |
+|--------|-------------|
+| Enable / disable | Enable or disable the account |
+| Unlock | Unlock a locked-out account |
+| Password never expires | Set the password so it never expires |
+| Must change at next logon | Require a password change at the next sign-in |
   
   
-* **Test mode / What‑if.** `What if ( Simulate Change Password )` always simulates.
-  `Change Passwords (live)` performs the real reset — but only when **Test mode** is
-  unchecked; with Test mode on, a live click is safely downgraded to a simulation.
+### Test mode / What‑if.
+  `What if ( Simulate Change Password )` always simulates.
+  `Change Passwords (live)` performs the real process — but only when **Test mode** is
+   unchecked; with Test mode on, a live click is downgraded to a simulation.
   
-**Reports.** One **HTML** + one **CSV** per top‑level OU, with an optional combined
-  report for all OUs. Reports are written to `files\report\` in the application folder
-  (created automatically), which opens after the run.
-  The HTML report has columns Name / Account / Status / State / PW, quick filter buttons
-  (**Active, Inactive, Locked, PW never expires**), a search box, and Changed/Skipped tabs.
-  Table **rows** use rotating colours (columns are not coloured); **hovering** a row makes
-  its text bold and changes the row background.
+### Reports.
+   One HTML + one CSV per top‑level OU, with an optional combined report for all OUs. 
+   Reports are written to `files\report\` in the application folder
+   The HTML report has columns Name / Account / State / Options / PW, quick filter buttons: **Active, Inactive, Locked, PW never expires**, 
+   a search box, and Changed/Skipped tabs.
   
-* **Logging.** Everything is logged to the on‑screen log box and to a **daily log file**
-  in `logs\`
-
 ---
-## Configuration — `settings\config\config.json`
-The file is created with defaults on first run. Key settings:
 
+## Configuration — config.json 
+The file settings\config\config.json is created with defaults on first run. 
+### Key settings:
 | Section | Key | Meaning |
 |--------|-----|---------|
 | `Domain` | `Server` | Optional DC / domain to target (blank = current domain). |
 | `Domain` | `SearchBase` | The OU used as the tree root. Blank = domain root; the top level is the OUs one level below it. |
 | `Domain` | `IncludeEmptyOus` | Show OUs with 0 users. |
-| `Attributes` | `PersonalIdAttribute` | AD attribute holding the personal id (default `employeeID`). |
 | `Attributes` | `DisplayNameAttribute` | Attribute used as the display name. |
 | `Generator` | `DefaultLength`, `UseUpper/Lower/Digit/Special`, `SpecialChars`, `AvoidAmbiguous`, `SamePasswordForAll` | Generator defaults (the policy always wins on minimum length/complexity). |
 | `Report` | `OutputFolder` | Where HTML/CSV reports are written. Default `files\report` — a **relative** path is resolved against the application folder; an absolute path (e.g. `D:\Reports` or a UNC share) is used as-is. Blank = `files\report`. |
